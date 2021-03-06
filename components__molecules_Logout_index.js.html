@@ -161,6 +161,7 @@ const Logout = () => {
 
   const handleLogout = () => {
     // save storage in db
+    setLoading(true)
     firebase
       .addStorage({
         email: user.email,
@@ -169,30 +170,27 @@ const Logout = () => {
         notifications: notification,
       })
       .then(() => {
-        setLoading(true)
-        firebase
-          .onAuthSignOut()
-          .then(() => {
-            cleanFavourites()
-            cleanCart()
-            cleanNotification()
-            onClose()
-            setLoading(false)
+        firebase.onAuthSignOut().catch((error) => {
+          console.error("error", error)
+          toast({
+            title: t("Logout.youCanNot"),
+            description: "",
+            status: "error",
+            position: "bottom",
+            duration: 5000,
+            isClosable: true,
           })
-          .catch((error) => {
-            console.error("error", error)
-            setLoading(false)
-            toast({
-              title: t("Logout.youCanNot"),
-              description: "",
-              status: "error",
-              position: "bottom",
-              duration: 5000,
-              isClosable: true,
-            })
-          })
+        })
+        cleanFavourites()
+        cleanCart()
+        cleanNotification()
+        onClose()
+        setLoading(false)
       })
-      .catch((error) => console.error("error", error))
+      .catch((error) => {
+        setLoading(false)
+        console.error("error", error)
+      })
   }
 
   const renderTitle = () => t("Logout.logout")

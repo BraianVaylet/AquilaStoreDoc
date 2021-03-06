@@ -128,6 +128,9 @@ import useSetColorTheme from "hooks/useSetColorTheme"
 import { FavouriteContext } from "context"
 // utils
 import { PropTypesProduct } from "utils/propTypes"
+import useUser from "hooks/useUser"
+// components
+import LoginAlert from "components/_organisms/LoginAlert"
 
 /**
  * FavouriteIconBtn Component
@@ -141,11 +144,14 @@ const FavouriteIconBtn = ({ item }) => {
     addItemToFavourites,
     deleteItemFromFavourites,
   } = useContext(FavouriteContext)
+  const user = useUser()
   const [favActive, setFavActive] = useState(
     favourites.filter((fav) => fav.id === item.id).length === 1
   )
   const backgroundColor = useSetColorTheme("gray.700", "white")
+  const [showLogin, setShowLogin] = useState(false)
 
+  useEffect(() => user &amp;&amp; setShowLogin(false), [user])
   useEffect(
     () =>
       setFavActive(favourites.filter((fav) => fav.id === item.id).length === 1),
@@ -158,42 +164,50 @@ const FavouriteIconBtn = ({ item }) => {
    * @returns {boolean} favActive
    */
   const handleFavActive = () => {
-    !favActive ? addItemToFavourites(item) : deleteItemFromFavourites(item)
-    setFavActive(!favActive)
+    if (!user) {
+      setShowLogin(true)
+    } else {
+      setShowLogin(false)
+      !favActive ? addItemToFavourites(item) : deleteItemFromFavourites(item)
+      setFavActive(!favActive)
+    }
   }
 
   return (
-    &lt;Button
-      onClick={handleFavActive}
-      p="2.5px"
-      backgroundColor={backgroundColor}
-      borderRadius="5px"
-      _hover={{
-        backgroundColor: backgroundColor,
-      }}
-    >
-      {favActive ? (
-        &lt;Icon
-          as={MdFavorite}
-          boxSize="2rem"
-          borderRadius="9999px"
-          fill="brand.primary"
-          _hover={{
-            fill: "brand.secundary",
-          }}
-        />
-      ) : (
-        &lt;Icon
-          as={MdFavoriteBorder}
-          boxSize="2rem"
-          borderRadius="9999px"
-          fill="brand.secundary"
-          _hover={{
-            fill: "brand.primary",
-          }}
-        />
-      )}
-    &lt;/Button>
+    &lt;>
+      {showLogin &amp;&amp; &lt;LoginAlert withClose fixed={false} />}
+      &lt;Button
+        onClick={handleFavActive}
+        p="2.5px"
+        backgroundColor={backgroundColor}
+        borderRadius="5px"
+        _hover={{
+          backgroundColor: backgroundColor,
+        }}
+      >
+        {favActive ? (
+          &lt;Icon
+            as={MdFavorite}
+            boxSize="2rem"
+            borderRadius="9999px"
+            fill="brand.primary"
+            _hover={{
+              fill: "brand.secundary",
+            }}
+          />
+        ) : (
+          &lt;Icon
+            as={MdFavoriteBorder}
+            boxSize="2rem"
+            borderRadius="9999px"
+            fill="brand.secundary"
+            _hover={{
+              fill: "brand.primary",
+            }}
+          />
+        )}
+      &lt;/Button>
+    &lt;/>
   )
 }
 

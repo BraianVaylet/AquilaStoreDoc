@@ -117,10 +117,11 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>import React from "react"
+            <pre class="prettyprint source linenums"><code>import React, { useState } from "react"
+import PropTypes from "prop-types"
 import { useTranslation } from "react-i18next"
 // chakra-ui
-import { useDisclosure, Flex } from "@chakra-ui/react"
+import { Flex } from "@chakra-ui/react"
 // components
 import CustomModal from "components/_atoms/CustomModal"
 import LoginGoogle from "components/_atoms/LoginGoogle"
@@ -132,15 +133,26 @@ import LoginFacebook from "components/_atoms/LoginFacebook"
  * @author Braian D. Vaylet
  * @description Componente Modal con login
  */
-const LoginAlert = () => {
+const LoginAlert = ({ withClose, fixed }) => {
   const [t] = useTranslation("global")
-  const { onClose } = useDisclosure()
+  const [open, setOpen] = useState(true)
 
-  return (
+  return fixed ? (
     &lt;CustomModal
       withCloseBtn={false}
       isOpen={true}
-      onClose={onClose}
+      header={t("LoginBtn.login2")}
+    >
+      &lt;Flex w="100%" direction="column" align="flex-start" justify="center">
+        &lt;LoginGoogle mb={2} />
+        &lt;LoginFacebook mb={2} />
+      &lt;/Flex>
+    &lt;/CustomModal>
+  ) : (
+    &lt;CustomModal
+      withCloseBtn={withClose}
+      isOpen={open}
+      onClose={() => setOpen(false)}
       header={t("LoginBtn.login2")}
     >
       &lt;Flex w="100%" direction="column" align="flex-start" justify="center">
@@ -149,6 +161,16 @@ const LoginAlert = () => {
       &lt;/Flex>
     &lt;/CustomModal>
   )
+}
+
+LoginAlert.defaultProps = {
+  withClose: false,
+  fixed: true,
+}
+
+LoginAlert.propTypes = {
+  withClose: PropTypes.bool,
+  fixed: PropTypes.bool,
 }
 
 export default LoginAlert
